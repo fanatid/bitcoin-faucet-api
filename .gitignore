@@ -1,0 +1,7 @@
+coverage
+node_modules
+
+faucet.js
+faucet.min.js
+faucet.test.js
+npm-debug.log
