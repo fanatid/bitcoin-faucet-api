@@ -1,0 +1,15 @@
+port: 6266
+
+loggerlevel: verbose # debug, verbose, info, error
+
+wallet:
+  mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
+  network: testnet # network name from bitcore.Networks
+  provider: cb-insight # https://github.com/dcousens/common-blockchain
+
+  donationsPoolSize: 10
+  rereshInterval: 30 # every N seconds collect new unspents for issuance and withdrawal
+
+  dbpath: wallet.db # path to data file
+  unspentsCount: 10 # for every type
+  issueLowerBound: 50 # in percent
