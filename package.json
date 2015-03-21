@@ -35,8 +35,11 @@
     "test": "istanbul test mocha -- --reporter spec test/*.js"
   },
   "dependencies": {
-    "bip39": "^2.1.0",
     "bitcore": "^0.11.4",
+    "bitcore-mnemonic": "^0.10.0",
+    "bluebird": "^2.9.14",
+    "cb-insight": "^0.1.0",
+    "error-system": "^0.1.0",
     "js-yaml": "^3.2.7",
     "lodash": "^3.5.0",
     "nedb": "^1.1.1",

@@ -1,6 +1,7 @@
 coverage
 node_modules
 
+faucet.log
 faucet.js
 faucet.min.js
 faucet.test.js
