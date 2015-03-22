@@ -2,9 +2,7 @@
 /* globals Promise:true */
 
 var fs = require('fs')
-var path = require('path')
 
-var _ = require('lodash')
 var http = require('http')
 var https = require('https')
 var express = require('express')

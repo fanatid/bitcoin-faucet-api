@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Bitcoin faucet service.",
   "author": "Fomichev Kirill <fanatid@ya.ru>",
-  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:fanatid/bitcoin-faucet.git"
@@ -18,11 +17,6 @@
     "testnet3",
     "faucet"
   ],
-  "files": [
-    "lib",
-    "LICENSE",
-    "README.md"
-  ],
   "scripts": {
     "coverage": "istanbul cover _mocha -- test/*.js",
     "coveralls": "npm run coverage && coveralls <coverage/lcov.info",
@@ -33,11 +27,15 @@
     "bitcore": "^0.11.4",
     "bitcore-mnemonic": "^0.10.0",
     "bluebird": "^2.9.14",
+    "body-parser": "^1.12.2",
     "cb-insight": "^0.1.0",
+    "compression": "^1.4.3",
     "error-system": "^0.1.0",
     "express": "^4.12.3",
+    "express-winston": "^0.2.12",
     "js-yaml": "^3.2.7",
     "lodash": "^3.5.0",
+    "method-override": "^2.3.2",
     "nedb": "^1.1.1",
     "soop": "^0.1.5",
     "winston": "^0.9.0",
@@ -52,10 +50,6 @@
   },
   "browser": {},
   "standard": {
-    "ignore": [
-      "faucet.js",
-      "faucet.min.js",
-      "faucet.test.js"
-    ]
+    "ignore": []
   }
 }
