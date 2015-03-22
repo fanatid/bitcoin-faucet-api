@@ -7,10 +7,12 @@ logger:
 
 provider:
   name: cb-insight # https://github.com/dcousens/common-blockchain (only insight now)
-  insightUrl: https://test-insight.bitpay.com/api/
+  insight:
+    url: https://test-insight.bitpay.com/api/
 
 storage:
   filename: wallet.db # path to data file
+  compactionInterval: 300 # in seconds
 
 faucet:
   withdrawal:
