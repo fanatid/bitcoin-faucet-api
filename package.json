@@ -24,14 +24,9 @@
     "README.md"
   ],
   "scripts": {
-    "build": "npm run-script compile && npm run-script uglify",
-    "compile": "browserify lib/index.js -s faucet -o faucet.js",
-    "compile_test": "browserify test/*.js -o faucet.test.js",
     "coverage": "istanbul cover _mocha -- test/*.js",
-    "coveralls": "npm run-script coverage && coveralls <coverage/lcov.info",
-    "clean": "rm -f faucet.js faucet.min.js faucet.test.js",
+    "coveralls": "npm run coverage && coveralls <coverage/lcov.info",
     "lint": "standard",
-    "uglify": "uglify -s faucet.js -o faucet.min.js",
     "test": "istanbul test mocha -- --reporter spec test/*.js"
   },
   "dependencies": {
@@ -40,6 +35,7 @@
     "bluebird": "^2.9.14",
     "cb-insight": "^0.1.0",
     "error-system": "^0.1.0",
+    "express": "^4.12.3",
     "js-yaml": "^3.2.7",
     "lodash": "^3.5.0",
     "nedb": "^1.1.1",
@@ -48,13 +44,11 @@
     "yargs": "^3.5.4"
   },
   "devDependencies": {
-    "browserify": "^9.0.3",
     "chai": "^2.1.1",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.7",
     "mocha": "^2.2.0",
-    "standard": "^2.10.0",
-    "uglify": "^0.1.1"
+    "standard": "^2.10.0"
   },
   "browser": {},
   "standard": {

@@ -1,9 +1,10 @@
 server:
   port: 6266
+  enableHTTPS: false
 
 logger:
   level: verbose # debug, verbose, info, error
-  filename: 'faucet.log'
+  filename: faucet.log
 
 provider:
   name: cb-insight # https://github.com/dcousens/common-blockchain (only insight now)

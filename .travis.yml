@@ -5,4 +5,4 @@ env:
   - TEST_SUITE=build
   - TEST_SUITE=coveralls
   - TEST_SUITE=lint
-script: "npm run-script $TEST_SUITE"
+script: "npm run $TEST_SUITE"
