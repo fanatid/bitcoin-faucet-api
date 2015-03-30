@@ -3,7 +3,7 @@ function getVersion () {
 }
 
 module.exports.render = function (req, res) {
-  res.send('API v' + getVersion())
+  res.send('faucet API v' + getVersion())
 }
 
 module.exports.version = function (req, res) {

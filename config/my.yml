@@ -9,7 +9,7 @@ logger:
 provider:
   name: insight # only insight now
   insight:
-    url: https://test-insight.bitpay.com/api/
+    url: http://devel.hz.udoidio.info:3001/api/
     timeout: 10000 # in milliseconds
 
 storage:
@@ -22,7 +22,7 @@ faucet:
     max: 1000000 # in satoshi
   unspents:
     allow: true
-    stockpile: 10 # for every type
+    stockpile: 5 # for every type
     issueLowerBound: 50 # in percent
     types:
       -
@@ -38,6 +38,6 @@ faucet:
 wallet:
   network: testnet # network name from bitcore.Networks
 
-  mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
-  passphrase: my faucet
-  addressesPoolSize: 10 # addresses pool size
+  mnemonic: hello female leader core filter robot rare purity laugh trim rug theme
+  passphrase:
+  addressesPoolSize: 3 # addresses pool size
