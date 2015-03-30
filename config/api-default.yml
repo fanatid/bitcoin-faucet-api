@@ -18,12 +18,10 @@ storage:
 
 faucet:
   withdrawal:
-    active: true
     max: 1000000 # in satoshi
   unspents:
-    allow: true
-    stockpile: 5 # for every type
-    issueLowerBound: 50 # in percent
+    stockpile: 10 # for every type
+    issueLowerBound: 5 # also for every type
     types:
       -
         name: 1
@@ -38,6 +36,6 @@ faucet:
 wallet:
   network: testnet # network name from bitcore.Networks
 
-  mnemonic: hello female leader core filter robot rare purity laugh trim rug theme
-  passphrase:
-  addressesPoolSize: 3 # addresses pool size
+  mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
+  passphrase: my faucet
+  addressesPoolSize: 10 # addresses pool size

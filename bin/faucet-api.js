@@ -24,10 +24,10 @@ var argv = yargs
   .argv
 
 // load config
-var config = require('./lib/config').load(argv.config)
+var config = require('../lib/config').load(argv.config)
 
 // logging unhadled errors
-var logger = require('./lib/logger').logger
+var logger = require('../lib/logger').logger
 Promise.onPossiblyUnhandledRejection(function (err) {
   logger.error(err.stack || err.toString())
 })
@@ -42,14 +42,14 @@ var server = (function () {
   }
 
   var opts = {}
-  opts.key = fs.readFileSync('./etc/faucet-key.pem')
-  opts.cert = fs.readFileSync('./etc/faucet-cert.pem')
+  opts.key = fs.readFileSync('../etc/faucet-key.pem')
+  opts.cert = fs.readFileSync('../etc/faucet-cert.pem')
   return https.createServer(opts, expressApp)
 })()
 
 // express settings
-require('./app/express')(expressApp)
-require('./app/routes')(expressApp)
+require('../app/express')(expressApp)
+require('../app/routes')(expressApp)
 
 // start the app by listening port
 server.listen(config.get('server.port'), function () {

@@ -4,8 +4,7 @@ module.exports = function (app) {
   app.get('/withdrawal', faucet.withdrawal)
 
   var index = require('./controllers/index')
-  /* @todo */
-  // app.get('/status', index.status)
+  app.get('/status', index.status)
   app.get('/version', index.version)
   app.get('*', index.render)
 }

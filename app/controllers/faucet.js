@@ -1,9 +1,11 @@
 var faucet = require('../../lib/faucet').default()
+var logger = require('../../lib/logger').logger
 
 function commonResponse (promise, res) {
   promise.done(function (data) {
     res.jsonp({status: 'success', data: data})
   }, function (err) {
+    logger.error('faucet error: ', err)
     res.jsonp({status: 'fail', message: err.message})
   })
 }
