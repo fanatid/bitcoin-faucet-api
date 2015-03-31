@@ -28,6 +28,7 @@
     "bitcore-mnemonic": "^0.10.0",
     "bluebird": "^2.9.14",
     "body-parser": "^1.12.2",
+    "component-emitter": "^1.2.0",
     "compression": "^1.4.3",
     "error-system": "^0.1.0",
     "express": "^4.12.3",
