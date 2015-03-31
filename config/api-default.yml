@@ -7,7 +7,7 @@ logger:
   filename: faucet.log
 
 provider:
-  name: insight # only insight now
+  name: insight # only insight now, with rawtx support (!)
   insight:
     url: http://devel.hz.udoidio.info:3001/api/
     timeout: 10000 # in milliseconds
@@ -39,3 +39,5 @@ wallet:
   mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
   passphrase: my faucet
   addressesPoolSize: 10 # addresses pool size
+
+  forceUnspentUpdate: 900 # in seconds
