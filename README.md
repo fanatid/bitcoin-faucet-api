@@ -1,8 +1,6 @@
 # bitcoin-faucet
 
-[![Version](http://img.shields.io/npm/v/bitcoin-faucet.svg?style=flat-square)](https://www.npmjs.org/package/bitcoin-faucet)
 [![build status](https://img.shields.io/travis/fanatid/bitcoin-faucet.svg?branch=master&style=flat-square)](http://travis-ci.org/fanatid/bitcoin-faucet)
-[![Coverage Status](https://img.shields.io/coveralls/fanatid/bitcoin-faucet.svg?style=flat-square)](https://coveralls.io/r/fanatid/bitcoin-faucet)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 
 Bitcoin faucet service.
