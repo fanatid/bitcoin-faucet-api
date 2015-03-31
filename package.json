@@ -18,7 +18,7 @@
     "faucet"
   ],
   "scripts": {
-    "lint": "standard",
+    "lint": "standard"
   },
   "dependencies": {
     "bitcore": "^0.11.4",

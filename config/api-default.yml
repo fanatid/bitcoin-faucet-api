@@ -24,13 +24,13 @@ faucet:
     issueLowerBound: 5 # also for every type
     types:
       -
-        name: 1
+        name: '1' # name as string, important!
         preload: [100000]
       -
-        name: 2
+        name: '2'
         preload: [25000, 25000]
       -
-        name: 3
+        name: '3'
         preload: [100000, 50000, 10000]
 
 wallet:
