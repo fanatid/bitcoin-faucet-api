@@ -40,4 +40,4 @@ wallet:
   passphrase: my faucet
   addressesPoolSize: 10 # addresses pool size
 
-  forceUnspentUpdate: 900 # in seconds
+  forceUnspentUpdate: 600 # in seconds
