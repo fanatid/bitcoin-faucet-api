@@ -10,6 +10,13 @@ Bitcoin faucet service
   * [API](#api)
   * [License](#license)
 
+Plans:
+  * colored coin support (after coloredcoinjs-lib@1.0.0 will be released?)
+  * integrate cc-wallet-core (after v1.0.0 will be released?)
+
+Known instances:
+  * http://devel.hz.udoidio.info:6266
+
 ## Requirements
 
   * [node.js](http://www.nodejs.org/download/) (testned only with v0.10)
