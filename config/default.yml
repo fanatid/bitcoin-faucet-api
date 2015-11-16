@@ -1,0 +1,34 @@
+server:
+  port: 6266
+  prefix: /api/v1
+
+logger:
+  level: verbose # debug, verbose, info, error
+  filename: faucet.log
+
+insight:
+  url: https://test-insight.bitpay.com/api
+  timeout: 10000 # in milliseconds
+
+postgresql:
+  url: postgres://user:pass@host:port/database_name
+  poolSize: 10
+
+wallet:
+  network: testnet # network name from bitcore.Networks
+
+  mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
+  passphrase: my faucet
+  addressesPoolSize: 10 # addresses pool size
+
+faucet:
+  withdrawal:
+    max: 1000000 # in satoshi
+  unspent:
+    stockpile: 10 # for every type
+    issueLowerBound: 5 # also for every type
+    types:
+      - name: 100k
+        values: [100000]
+      - name: 2x25k
+        values: [25000, 25000]

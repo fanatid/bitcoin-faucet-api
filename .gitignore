@@ -1,7 +1,6 @@
-coverage
-build
+app
+config
 node_modules
 
 faucet.log
 npm-debug.log
-wallet.db
