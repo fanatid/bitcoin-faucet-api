@@ -72,11 +72,14 @@ export default class Wallet {
     this._insight = insight
 
     this._network = null
-    this._addresses = []
+    this._privateKeys = {}
+    this._txFeePerKb = bitcore.Transaction.FEE_PER_KB
+    this._utxos = []
+    this._utxosMaxUnspentAmount = 1e3 * 1e8
+    this._utxosTotalAmount = 0
+
     this._withdrawalMax = null
     this._preloadTypes = {}
-    this._utxos = []
-    this._utxosTotalAmount = 0
 
     this._storage.ready
       .then(::this._init)
@@ -105,11 +108,21 @@ export default class Wallet {
     let privateKeyChain = privateKeyRoot.derive('m/0/0')
     let poolSize = config.get('wallet.addressesPoolSize')
     isValid(poolSize, [_.isFinite, x => x > 0], 'Addresses pool size')
-    this._addresses = _.zipObject(_.range(poolSize).map((index) => {
+    this._privateKeys = _.zipObject(_.range(poolSize).map((index) => {
       let privateKey = privateKeyChain.derive(index).privateKey
       let address = privateKey.toAddress(this._network).toString()
       return [address, privateKey]
     }))
+
+    // get unspent max amount
+    let maxAmount = parseInt(config.get('wallet.unspentMaxAmount', this._utxosMaxUnspentAmount), 10)
+    isValid(maxAmount, [_.isFinite, x => x > 1e4], 'Unspent max amount')
+    this._utxosMaxUnspentAmount = maxAmount
+
+    // get fee per kb
+    let feePerKb = parseInt(config.get('wallet.feePerKB', this._txFeePerKb), 10)
+    isValid(feePerKb, [_.isFinite, x => x > 0], 'Fee per Kb')
+    this._txFeePerKb = feePerKb
 
     // load withdrawal max
     this._withdrawalMax = config.get('faucet.withdrawal.max')
@@ -164,6 +177,34 @@ export default class Wallet {
   }
 
   /**
+   * @return {bitcore.Transaction}
+   */
+  _txNew () {
+    let tx = new bitcore.Transaction()
+    tx.feePerKb(this._txFeePerKb)
+    tx.change(this.getRandomAddress())
+    return tx
+  }
+
+  /**
+   * @param {bitcore.Transaction} tx
+   * @param {Insight~UnspentObject[]} utxos
+   */
+  _txSign (tx, utxos) {
+    let applySignature = ::tx.applySignature
+
+    let indexedUTXOs = _.indexBy(utxos, 'script')
+    for (let [index, input] of tx.inputs.entries()) {
+      let address = indexedUTXOs[input.output.script.toHex()].address
+      // get private key and create hashData
+      let privateKey = this._privateKeys[address]
+      let hashData = bitcore.crypto.Hash.sha256ripemd160(privateKey.publicKey.toBuffer())
+      // get and apply signatures
+      input.getSignatures(tx, privateKey, index, SIGHASH_ALL, hashData).map(applySignature)
+    }
+  }
+
+  /**
    * @private
    * @param {function} fn
    * @return {Promise<*>}
@@ -186,7 +227,34 @@ export default class Wallet {
    */
   _utxosUpdate () {
     return this._utxosLock(async () => {
-      let utxosNew = await this._insight.getUnspent(_.keys(this._addresses))
+      let utxosNew
+      while (true) {
+        // get from insight
+        utxosNew = await this._insight.getUnspent(_.keys(this._privateKeys))
+
+        // filter too much unspent
+        let utxos = utxosNew.filter(utxo => utxo.satoshis > this._utxosMaxUnspentAmount)
+        if (_.sum(utxos, 'satoshis') > 1.1 * this._utxosMaxUnspentAmount) {
+          break
+        }
+
+        // split all big utxos in one transaction
+        let tx = this._txNew().from(utxos)
+        for (let count = Math.floor((tx.inputAmount - 1e5) / this._utxosMaxUnspentAmount); count > 0; --count) {
+          tx.to(this.getRandomAddress(), this._utxosMaxUnspentAmount)
+        }
+
+        // sign
+        this._txSign(tx, utxos)
+
+        // send to insight
+        await this._insight.sendTx(tx)
+
+        // sleep for while process new tx
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+
+      // save and calculate new balance
       this._utxos = _.sortBy(utxosNew, utxo => -utxo.satoshis)
       this._utxosTotalAmountUpdate()
       logger.info(`Update UTXOS, new balance: ${this._utxosTotalAmount}`)
@@ -199,45 +267,33 @@ export default class Wallet {
    * @param {boolean} wait
    * @return {Promise<boolean>}
    */
-  async _utxosAddToTx (tx, wait) {
-    let requiredAmount = _.sum(tx.outputs, 'satoshis')
+  async _utxosFinishTx (tx, wait) {
+    let getRequiredAmount = () => tx.outputAmount + tx.getFee() + 1e5
 
     while (true) {
       // update UTXO if required
-      if (requiredAmount + 1e6 > this._utxosTotalAmount) {
-        await this._utxosUpdate
+      if (getRequiredAmount() > this._utxosTotalAmount) {
+        await this._utxosUpdate()
       }
 
       let success = await this._utxosLock(async () => {
         // make sure that have enough coins
-        if (requiredAmount + 1e6 > this._utxosTotalAmount) {
-          logger.warn(`Insufficient funds! Required: ${requiredAmount + 1e6}, available: ${this._utxosTotalAmount}`)
+        if (getRequiredAmount() > this._utxosTotalAmount) {
+          logger.warn(`Insufficient funds! Required: ${getRequiredAmount()}, available: ${this._utxosTotalAmount}`)
           return false
         }
 
-        let addresses = {}
-        while (requiredAmount > 0) {
-          // pop utxo and descrise required amount
-          let utxo = this._utxos.pop()
-          requiredAmount -= utxo.satoshis
-
-          // add utxo
-          tx.from(utxo)
-
-          // save script to address
-          addresses[utxo.script] = utxo.address
+        // collect utxos
+        let utxos = []
+        while (tx.inputAmount - tx.outputAmount - tx.getFee() <= 0) {
+          utxos.push(this._utxos.pop())
         }
+
+        // add utxos
+        tx.from(utxos)
 
         // sign
-        for (let [index, input] of tx.inputs.entries()) {
-          // get address by script
-          let address = addresses[input.output.script.toHex()]
-          // get private key
-          let privateKey = this._addresses[address]
-          let hashData = bitcore.crypto.Hash.sha256ripemd160(privateKey.publicKey.toBuffer())
-          // get and apply signatures
-          input.getSignatures(tx, privateKey, index, SIGHASH_ALL, hashData).map(::tx.applySignature)
-        }
+        this._txSign(tx, utxos)
 
         return true
       })
@@ -280,7 +336,7 @@ export default class Wallet {
       }
 
       // create tx
-      let tx = new bitcore.Transaction()
+      let tx = this._txNew()
 
       // create preload and add outputs
       let required = preload.stockpile - preload.count
@@ -307,11 +363,8 @@ export default class Wallet {
         }
       })
 
-      // add change
-      tx.change(this.getRandomAddress())
-
       // add utxos and sign
-      await this._utxosAddToTx(tx, true)
+      await this._utxosFinishTx(tx, true)
 
       // send to insight
       await this._insight.sendTx(tx)
@@ -398,12 +451,10 @@ export default class Wallet {
 
     try {
       // create tx
-      let tx = new bitcore.Transaction()
-        .to(address, satoshis)
-        .change(this.getRandomAddress())
+      let tx = this._txNew().to(address, satoshis)
 
       // try finish tx
-      let success = await this._utxosAddToTx(tx, false)
+      let success = await this._utxosFinishTx(tx, false)
       if (!success) {
         throw new errors.JSENDError(`Insufficient funds`)
       }
@@ -435,7 +486,7 @@ export default class Wallet {
    * @return {string}
    */
   getRandomAddress () {
-    let addresses = _.keys(this._addresses)
+    let addresses = _.keys(this._privateKeys)
     return addresses[_.random(addresses.length - 1)]
   }
 

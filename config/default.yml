@@ -16,6 +16,8 @@ postgresql:
 
 wallet:
   network: testnet # network name from bitcore.Networks
+  unspentMaxAmount: 5000000
+  feePerKB: 15000
 
   mnemonic: clever miracle diet judge simple clock party report replace ancient wrist era
   passphrase: my faucet

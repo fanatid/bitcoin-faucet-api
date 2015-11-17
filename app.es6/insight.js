@@ -90,8 +90,8 @@ export default class Insight {
    * @return {Promise}
    */
   async sendTx (tx) {
-    let rawTx = tx.toString()
-    logger.verbose(`sendTx ${tx.id} (${rawTx})`)
+    let rawTx = tx.serialize()
+    logger.verbose(`sendTx ${tx.id} (size: ${rawTx.length / 2})`)
 
     await this._request({
       method: 'POST',
