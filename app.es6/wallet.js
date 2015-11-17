@@ -214,13 +214,6 @@ export default class Wallet {
 
   /**
    * @private
-   */
-  _utxosTotalAmountUpdate () {
-    this._utxosTotalAmount = _.sum(this._utxos, 'satoshis')
-  }
-
-  /**
-   * @private
    * @return {Promise}
    */
   _utxosUpdate () {
@@ -254,7 +247,7 @@ export default class Wallet {
 
       // save and calculate new balance
       this._utxos = _.sortBy(utxosNew, utxo => -utxo.satoshis)
-      this._utxosTotalAmountUpdate()
+      this._utxosTotalAmount = _.sum(this._utxos, 'satoshis')
       logger.info(`Update UTXOS, new balance: ${this._utxosTotalAmount}`)
     })
   }
@@ -288,6 +281,7 @@ export default class Wallet {
           utxos.push(this._utxos.pop())
           tx.from(_.last(utxos))
         }
+        this._utxosTotalAmount = _.sum(this._utxos, 'satoshis')
 
         // sign
         this._txSign(tx, utxos)
@@ -390,12 +384,12 @@ export default class Wallet {
       })
 
       // update preload count
-      preload.count += required
+      preload.count += preload.issuePerOneTx
 
       // try more
       setImmediate(this._preloadIssueNew.bind(this, name))
 
-      logger.info(`Preload ${name}, issued: ${required}, total: ${preload.count}`)
+      logger.info(`Preload ${name}, issued: ${preload.issuePerOneTx}, total: ${preload.count}`)
     })
   }
 
@@ -499,6 +493,7 @@ export default class Wallet {
       },
       wallet: {
         network: this._network.name,
+        utxosCount: this._utxos.length,
         balance: this._utxosTotalAmount
       },
       faucet: {

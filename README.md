@@ -138,7 +138,8 @@
         },
         "wallet": {
           "network": "testnet",
-          "balance": 511915368 // cached
+          "utxosCount": 28,
+          "balance": 511915368
         },
         "faucet": {
           "withdrawal": {
@@ -146,17 +147,13 @@
           },
           "preload": {
             "types": [{
-              "name": "1",
+              "name": "100k",
               "count": 100,
               "values": [100000]
             }, {
-              "name": "2",
+              "name": "2x25k",
               "count": 100,
               "values": [25000, 25000]
-            }, {
-              "name": "3",
-              "count": 100,
-              "values": [100000, 50000, 10000]
             }]
           }
         }
