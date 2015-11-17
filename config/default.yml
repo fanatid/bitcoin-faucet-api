@@ -27,8 +27,8 @@ faucet:
   withdrawal:
     max: 1000000 # in satoshi
   unspent:
-    stockpile: 10 # for every type
-    issueLowerBound: 5 # also for every type
+    issueLowerBound: 1000 # for every type
+    issuePerOneTx: 250 # for every type
     types:
       - name: 100k
         values: [100000]

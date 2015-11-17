@@ -115,12 +115,12 @@ export default class Wallet {
     }))
 
     // get unspent max amount
-    let maxAmount = parseInt(config.get('wallet.unspentMaxAmount', this._utxosMaxUnspentAmount), 10)
+    let maxAmount = config.get('wallet.unspentMaxAmount', this._utxosMaxUnspentAmount)
     isValid(maxAmount, [_.isFinite, x => x > 1e4], 'Unspent max amount')
     this._utxosMaxUnspentAmount = maxAmount
 
     // get fee per kb
-    let feePerKb = parseInt(config.get('wallet.feePerKB', this._txFeePerKb), 10)
+    let feePerKb = config.get('wallet.feePerKB', this._txFeePerKb)
     isValid(feePerKb, [_.isFinite, x => x > 0], 'Fee per Kb')
     this._txFeePerKb = feePerKb
 
@@ -143,21 +143,21 @@ export default class Wallet {
       }
       let preloadTypeId = result.rows[0].id
 
-      // check stockpile
-      let stockpile = _.get(item, 'stockpile', config.get('faucet.unspent.stockpile'))
-      isValid(stockpile, [_.isFinite, x => x > 0], `${name} stockpile`)
-
       // check issueLowerBound
       let issueLowerBound = _.get(item, 'issueLowerBound', config.get('faucet.unspent.issueLowerBound'))
-      isValid(issueLowerBound, [_.isFinite, x => x < stockpile], `${name} issueLowerBound (stockpile = ${stockpile})`)
+      isValid(issueLowerBound, [_.isFinite, x => x > 0], `${name} issueLowerBound`)
+
+      // check issuePerOneTx
+      let issuePerOneTx = _.get(item, 'issuePerOneTx', config.get('faucet.unspent.issuePerOneTx'))
+      isValid(issuePerOneTx, [_.isFinite, x => x > 0], `${name} issuePerOneTx`)
 
       // save preload
       this._preloadTypes[name] = {
         preloadTypeId: preloadTypeId,
         values: values,
         count: 0,
-        stockpile: stockpile,
         issueLowerBound: issueLowerBound,
+        issuePerOneTx: issuePerOneTx,
         lock: makeConcurrent((fn) => { return fn.apply(this, arguments) }, {concurrency: 1})
       }
     })
@@ -167,12 +167,10 @@ export default class Wallet {
 
     // update preloads
     for (let name of _.keys(this._preloadTypes)) {
-      setImmediate(async () => {
-        // get count
-        await this._preloadUpdateCount(name)
-        // issue new if required
-        await this._preloadIssueNew(name)
-      })
+      // get count
+      await this._preloadUpdateCount(name)
+      // issue new if required
+      setImmediate(this._preloadIssueNew.bind(this, name))
     }
   }
 
@@ -268,7 +266,7 @@ export default class Wallet {
    * @return {Promise<boolean>}
    */
   async _utxosFinishTx (tx, wait) {
-    let getRequiredAmount = () => tx.outputAmount + tx.getFee() + 1e5
+    let getRequiredAmount = () => tx.outputAmount + tx.getFee() + 1e6
 
     while (true) {
       // update UTXO if required
@@ -285,12 +283,11 @@ export default class Wallet {
 
         // collect utxos
         let utxos = []
-        while (tx.inputAmount - tx.outputAmount - tx.getFee() <= 0) {
+        let savedOutputAmount = tx.outputAmount
+        while (tx.inputAmount - savedOutputAmount - tx.getFee() <= 0) {
           utxos.push(this._utxos.pop())
+          tx.from(_.last(utxos))
         }
-
-        // add utxos
-        tx.from(utxos)
 
         // sign
         this._txSign(tx, utxos)
@@ -331,7 +328,7 @@ export default class Wallet {
   _preloadIssueNew (name) {
     let preload = this._preloadTypes[name]
     return preload.lock(async () => {
-      if (preload.count >= preload.issueLowerBound) {
+      if (preload.count > preload.issueLowerBound) {
         return
       }
 
@@ -339,8 +336,7 @@ export default class Wallet {
       let tx = this._txNew()
 
       // create preload and add outputs
-      let required = preload.stockpile - preload.count
-      let preloadObjs = _.range(required).map(() => {
+      let preloadObjs = _.range(preload.issuePerOneTx).map(() => {
         let mnemonic = new Mnemonic()
         let passphrase = bitcore.crypto.Random.getRandomBuffer(4).toString('hex')
         let seed = mnemonic.toSeed(passphrase).toString('hex')
@@ -395,6 +391,9 @@ export default class Wallet {
 
       // update preload count
       preload.count += required
+
+      // try more
+      setImmediate(this._preloadIssueNew.bind(this, name))
 
       logger.info(`Preload ${name}, issued: ${required}, total: ${preload.count}`)
     })
