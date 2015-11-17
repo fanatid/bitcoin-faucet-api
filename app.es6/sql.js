@@ -93,24 +93,21 @@ export default {
 
     },
     preload: {
-      getOne: `DELETE FROM
-                 preload
-               WHERE
-                 id = (SELECT
-                         id
-                       FROM
-                         preload
-                       OFFSET
-                         floor(random() * (SELECT
-                                             COUNT(*)
-                                           FROM
-                                             preload
-                                           WHERE
-                                             preload_type_id = $1))
-                       LIMIT
-                         1)
-               RETURNING
-                 data`
+      oldestOne: `DELETE FROM
+                    preload
+                  WHERE
+                    id = (SELECT
+                            id
+                          FROM
+                            preload
+                          WHERE
+                            preload_type_id = $1
+                          ORDER BY
+                            id
+                          LIMIT
+                            1)
+                  RETURNING
+                    data`
     }
   }
 }

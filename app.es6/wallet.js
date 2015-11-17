@@ -225,7 +225,7 @@ export default class Wallet {
 
         // filter too much unspent
         let utxos = utxosNew.filter(utxo => utxo.satoshis > this._utxosMaxUnspentAmount)
-        if (_.sum(utxos, 'satoshis') > 1.1 * this._utxosMaxUnspentAmount) {
+        if (_.sum(utxos, 'satoshis') < 1.1 * this._utxosMaxUnspentAmount) {
           break
         }
 
@@ -409,7 +409,7 @@ export default class Wallet {
       }
 
       // try fetch from storage
-      let {rows} = await this._storage.executeQuery(SQL.delete.preload.getOne, [preload.preloadTypeId])
+      let {rows} = await this._storage.executeQuery(SQL.delete.preload.oldestOne, [preload.preloadTypeId])
       if (rows.length === 0) {
         setImmediate(this._preloadUpdateCount.bind(this, name))
         throw new errors.JSENDError(`Preload ${name} not available`)
@@ -438,7 +438,7 @@ export default class Wallet {
     }
 
     // check max
-    if (satoshis >= this._withdrawalMax) {
+    if (satoshis > this._withdrawalMax) {
       throw new errors.JSENDFail(`Max available on faucet is ${this._withdrawalMax}, you request ${satoshis}`)
     }
 
