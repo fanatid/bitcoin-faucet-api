@@ -41,6 +41,7 @@
   * [preload](#preload)
   * [withdrawal](#withdrawal)
   * [donation](#donation)
+  * [status](#status)
   * [version](#version)
 
 #### preload
@@ -125,6 +126,42 @@
 
   **url**
 
+    /status
+
+  **result**
+
+    {
+      "status": "success",
+      "insight": {
+        "url": http://test-insight.bitpay.com/api"
+      },
+      "wallet": {
+        "network": "testnet",
+        "utxosCount": 28,
+        "balance": 511915368
+      },
+      "faucet": {
+        "withdrawal": {
+          "max": 1000000
+        },
+        "preload": {
+          "types": [{
+            "name": "100k",
+            "count": 100,
+            "values": [100000]
+          }, {
+            "name": "2x25k",
+            "count": 100,
+            "values": [25000, 25000]
+          }]
+        }
+      }
+    }
+
+#### version
+
+  **url**
+
     /version
 
   **result**
@@ -132,32 +169,6 @@
     {
       "status": "success",
       "version": "0.1.0"
-      "config": {
-        "insight": {
-          "url": http://test-insight.bitpay.com/api"
-        },
-        "wallet": {
-          "network": "testnet",
-          "utxosCount": 28,
-          "balance": 511915368
-        },
-        "faucet": {
-          "withdrawal": {
-            "max": 1000000
-          },
-          "preload": {
-            "types": [{
-              "name": "100k",
-              "count": 100,
-              "values": [100000]
-            }, {
-              "name": "2x25k",
-              "count": 100,
-              "values": [25000, 25000]
-            }]
-          }
-        }
-      }
     }
 
 ## License

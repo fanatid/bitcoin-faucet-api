@@ -30,10 +30,11 @@ export default {
     }))
   },
 
+  status: (req, res) => {
+    res.promise(Promise.resolve(req.wallet.getStatus()))
+  },
+
   version: (req, res) => {
-    res.promise(Promise.resolve({
-      version: VERSION,
-      config: req.wallet.getStatus()
-    }))
+    res.promise(Promise.resolve({version: VERSION}))
   }
 }

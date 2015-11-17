@@ -8,6 +8,7 @@ export default function createRoutes (app) {
   router.get('/preload', controllers.preload)
   router.get('/withdrawal', controllers.withdrawal)
   router.get('/donation', controllers.donation)
+  router.get('/status', controllers.status)
   router.get('/version', controllers.version)
 
   return router
