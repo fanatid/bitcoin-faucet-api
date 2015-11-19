@@ -3,7 +3,6 @@
 [![build status](https://img.shields.io/travis/fanatid/bitcoin-faucet-api.svg?branch=master&style=flat-square)](http://travis-ci.org/fanatid/bitcoin-faucet-api)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
 [![Dependency status](https://img.shields.io/david/fanatid/bitcoin-faucet-api.svg?style=flat-square)](https://david-dm.org/fanatid/bitcoin-faucet-api#info=dependencies)
-[![Dev Dependency status](https://img.shields.io/david/fanatid/bitcoin-faucet-api.svg?style=flat-square)](https://david-dm.org/fanatid/bitcoin-faucet-api#info=devDependencies)
 
   * [Requirements](#requirements)
   * [Installation](#installation)

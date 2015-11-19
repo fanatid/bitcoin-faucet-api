@@ -1,6 +1,6 @@
 {
   "name": "bitcoin-faucet-api",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bitcoin faucet service.",
   "keywords": [
     "bitcoin",
@@ -12,14 +12,10 @@
     "url": "https://github.com/fanatid/bitcoin-faucet-api/issues"
   },
   "license": "MIT",
-  "author": {
-    "name": "Kirill Fomichev",
-    "email": "fanatid@ya.ru"
-  },
+  "author": "Kirill Fomichev <fanatid@ya.ru>",
   "files": [
     "app",
     "app.es6",
-    "LICENSE",
     "README.md"
   ],
   "main": "./bin/faucet-api.js",
@@ -65,11 +61,10 @@
     "standard": "^5.3.1"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=0.12"
   },
   "private": true,
   "standard": {
-    "ignore": [],
     "parser": "babel-eslint"
   }
 }
