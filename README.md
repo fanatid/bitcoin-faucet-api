@@ -172,4 +172,4 @@
 
 ## License
 
-Code released under [the MIT license](https://github.com/fanatid/bitcoin-faucet-api/blob/master/LICENSE).
+This software is licensed under the MIT License.
