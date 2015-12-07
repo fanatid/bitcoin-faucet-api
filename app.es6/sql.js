@@ -81,16 +81,10 @@ export default {
       empty: `DELETE FROM
                 preload_type
               WHERE
-                id IN (SELECT
-                         id
-                       FROM
-                         preload_type
-                       WHERE
-                         id NOT IN (SELECT
-                                      DISTINCT(preload_type_id)
-                                    FROM
-                                      preload))`
-
+                id NOT IN (SELECT
+                             DISTINCT(preload_type_id)
+                           FROM
+                             preload)`
     },
     preload: {
       oldestOne: `DELETE FROM

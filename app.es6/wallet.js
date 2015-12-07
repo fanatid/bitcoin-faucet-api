@@ -12,8 +12,6 @@ import logger from './logger'
 import SQL from './sql'
 import { isValid } from './util'
 
-let SIGHASH_ALL = bitcore.crypto.Signature.SIGHASH_ALL
-
 /**
  * @typedef {Object} Wallet~PreloadUnspentObject
  * @property {string} txId
@@ -134,12 +132,12 @@ export default class Wallet {
 
       // check (name, values) uniqueness
       let values = item.values
-      let result = await this._storage.executeQuery(SQL.select.preloadType.values, [name])
+      let result = await this._storage.run(SQL.select.preloadType.values, [name])
       if (result.rows.length > 0 && result.rows[0].values !== JSON.stringify(values)) {
         throw new Error(`Expected ${result.rows[0].values} for ${name} got ${JSON.stringify(values)}`)
       }
       if (result.rows.length === 0) {
-        result = await this._storage.executeQuery(SQL.insert.preloadType.row, [name, JSON.stringify(values)])
+        result = await this._storage.run(SQL.insert.preloadType.row, [name, JSON.stringify(values)])
       }
       let preloadTypeId = result.rows[0].id
 
@@ -190,6 +188,7 @@ export default class Wallet {
    */
   _txSign (tx, utxos) {
     let applySignature = ::tx.applySignature
+    let sigType = bitcore.crypto.Signature.SIGHASH_ALL
 
     let indexedUTXOs = _.indexBy(utxos, 'script')
     for (let [index, input] of tx.inputs.entries()) {
@@ -198,7 +197,7 @@ export default class Wallet {
       let privateKey = this._privateKeys[address]
       let hashData = bitcore.crypto.Hash.sha256ripemd160(privateKey.publicKey.toBuffer())
       // get and apply signatures
-      input.getSignatures(tx, privateKey, index, SIGHASH_ALL, hashData).map(applySignature)
+      input.getSignatures(tx, privateKey, index, sigType, hashData).map(applySignature)
     }
   }
 
@@ -309,7 +308,7 @@ export default class Wallet {
   _preloadUpdateCount (name) {
     let preload = this._preloadTypes[name]
     return preload.lock(async () => {
-      let {rows} = await this._storage.executeQuery(SQL.select.preload.count, [name])
+      let {rows} = await this._storage.run(SQL.select.preload.count, [name])
       preload.count = parseInt(rows[0].count, 10)
     })
   }
@@ -376,7 +375,7 @@ export default class Wallet {
       }
 
       // save to storage
-      await this._storage.executeTransaction((client) => {
+      await this._storage.runTransaction((client) => {
         return Promise.all(preloadObjs.map((obj) => {
           let data = JSON.stringify(obj)
           return client.queryAsync(SQL.insert.preload.row, [preload.preloadTypeId, data])
@@ -409,7 +408,7 @@ export default class Wallet {
       }
 
       // try fetch from storage
-      let {rows} = await this._storage.executeQuery(SQL.delete.preload.oldestOne, [preload.preloadTypeId])
+      let {rows} = await this._storage.run(SQL.delete.preload.oldestOne, [preload.preloadTypeId])
       if (rows.length === 0) {
         setImmediate(this._preloadUpdateCount.bind(this, name))
         throw new errors.JSENDError(`Preload ${name} not available`)

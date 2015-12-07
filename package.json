@@ -25,7 +25,6 @@
     "url": "git@github.com:fanatid/bitcoin-faucet-api.git"
   },
   "scripts": {
-    "prepublish": "npm run lint && npm run clean && npm run compile && npm run test",
     "clean": "rm -rf app",
     "compile": "mkdir -p app && babel app.es6 -d app",
     "compile:watch": "mkdir -p app && babel app.es6 -d app -w",
@@ -39,7 +38,7 @@
     "bluebird": "^3.0.5",
     "body-parser": "^1.12.2",
     "compression": "^1.4.3",
-    "core-decorators": "^0.8.1",
+    "core-decorators": "^0.9.1",
     "error-system": "^1.0.1",
     "express": "^4.12.3",
     "express-winston": "^0.4.1",
@@ -51,7 +50,7 @@
     "promise-useful-utils": "^0.2.1",
     "ready-mixin": "^2.0.0",
     "request": "^2.54.0",
-    "source-map-support": "^0.3.3",
+    "source-map-support": "^0.4.0",
     "url-join": "0.0.1",
     "winston": "^2.1.0",
     "yargs": "^3.5.4"

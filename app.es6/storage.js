@@ -36,7 +36,7 @@ export default class Storage {
    * @return {Promise}
    */
   _checkEnv (client) {
-    return this.executeTransaction(async (client) => {
+    return this.runTransaction(async (client) => {
       let names = SQL.create.tables.map(q => /TABLE (.*) \(/.exec(q)[1])
       let result = await client.queryAsync(SQL.select.tablesCount, [names])
       let count = parseInt(result.rows[0].count, 10)
@@ -97,7 +97,7 @@ export default class Storage {
    * @param {function} fn
    * @return {Promise}
    */
-  async execute (fn) {
+  async connect (fn) {
     let [client, done] = await pg.connectAsync(this._url)
     try {
       let result = await fn(client)
@@ -114,8 +114,8 @@ export default class Storage {
    * @param {Array.<*>} [params]
    * @return {Promise}
    */
-  executeQuery (query, params) {
-    return this.execute((client) => {
+  run (query, params) {
+    return this.connect((client) => {
       return client.queryAsync(query, params)
     })
   }
@@ -124,8 +124,8 @@ export default class Storage {
    * @param {function} fn
    * @return {Promise}
    */
-  executeTransaction (fn) {
-    return this.execute(async (client) => {
+  runTransaction (fn) {
+    return this.connect(async (client) => {
       await client.queryAsync('BEGIN')
       try {
         var result = await fn(client)
